@@ -19,7 +19,13 @@ export default function Dashboard() {
   const [loans, setLoans] = useState([]);
 
   useEffect(() => {
-    setLoans(getLoans() || []);
+    try {
+      const data = getLoans();
+      setLoans(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.log("Dashboard error:", err);
+      setLoans([]);
+    }
   }, []);
 
   const total = loans.reduce((s, l) => s + Number(l.amount || 0), 0);
@@ -36,7 +42,7 @@ export default function Dashboard() {
   const COLORS = ["#22c55e", "#ef4444", "#facc15"];
 
   const barData = loans.map((l, i) => ({
-    name: `L${i + 1}`,
+    name: `Loan ${i + 1}`,
     amount: Number(l.amount || 0),
   }));
 
@@ -49,7 +55,7 @@ export default function Dashboard() {
     <div style={styles.container}>
       <h2 style={styles.title}>🏦 Fintech Dashboard</h2>
 
-      {/* TOP METRICS */}
+      {/* METRICS */}
       <div style={styles.grid}>
         <div style={styles.card}>
           <h3>Total Loans</h3>
@@ -103,7 +109,7 @@ export default function Dashboard() {
           </ResponsiveContainer>
         </div>
 
-        {/* LINE (GROWTH) */}
+        {/* LINE */}
         <div style={styles.card}>
           <h3>Loan Growth Trend</h3>
           <ResponsiveContainer width="100%" height={250}>
@@ -115,7 +121,44 @@ export default function Dashboard() {
             </LineChart>
           </ResponsiveContainer>
         </div>
+
       </div>
     </div>
   );
 }
+
+/* ================= STYLES ================= */
+const styles = {
+  container: {
+    padding: "20px",
+    minHeight: "100vh",
+    background: "#0b1220",
+    color: "#fff",
+  },
+
+  title: {
+    textAlign: "center",
+    marginBottom: "20px",
+    color: "#38bdf8",
+  },
+
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+    gap: "15px",
+  },
+
+  chartGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+    gap: "15px",
+    marginTop: "20px",
+  },
+
+  card: {
+    background: "#111827",
+    padding: "15px",
+    borderRadius: "12px",
+    boxShadow: "0 5px 15px rgba(0,0,0,0.4)",
+  },
+};

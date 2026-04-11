@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { saveLoan } from "../utils/LocalStorage";
+import { processLoan } from "../utils/loanProcesser";
 
 export default function LoanApplication() {
   const navigate = useNavigate();
+
+  const [answers] = useState([]);
 
   const [form, setForm] = useState({
     name: "",
@@ -18,20 +22,23 @@ export default function LoanApplication() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 🔥 VALIDATION FUNCTION
   const validate = () => {
     let newErrors = {};
 
     if (!form.name.trim()) newErrors.name = "Name is required";
     if (!form.phone.trim()) newErrors.phone = "Phone is required";
-     else if (!/^[0-9]{6,15}$/.test(form.phone)) {
-  newErrors.phone = "Enter a valid phone number (9-10 digits)";}
+    else if (!/^[0-9]{6,15}$/.test(form.phone)) {
+      newErrors.phone = "Enter a valid phone number";
+    }
 
     if (!form.amount || form.amount <= 0)
-      newErrors.amount = "Enter a valid amount";
+      newErrors.amount = "Enter valid amount";
+
     if (!form.period || form.period <= 0)
       newErrors.period = "Enter repayment period";
-    if (!form.reason.trim()) newErrors.reason = "Reason is required";
+
+    if (!form.reason.trim())
+      newErrors.reason = "Reason is required";
 
     setErrors(newErrors);
 
@@ -39,14 +46,24 @@ export default function LoanApplication() {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault(); // 🔥 IMPORTANT
 
-    // ❌ STOP IF INVALID
     if (!validate()) return;
 
-    localStorage.setItem("loan", JSON.stringify(form));
+    // 🔥 FIX: use form values properly
+    const loan = {
+      name: form.name,
+      phone: form.phone,
+      amount: Number(form.amount),
+      period: form.period,
+      reason: form.reason,
+    };
 
-    alert("Loan saved successfully!");
+    const processed = processLoan(loan, answers);
+
+    saveLoan(processed);
+
+    localStorage.setItem("loan", JSON.stringify(processed));
 
     navigate("/checkout");
   };
@@ -56,7 +73,6 @@ export default function LoanApplication() {
       <h2 style={{ color: "#facc15" }}>💰 Loan Application</h2>
 
       <form className="card" onSubmit={handleSubmit}>
-        {/* NAME */}
         <input
           name="name"
           placeholder="Full Name"
@@ -64,8 +80,7 @@ export default function LoanApplication() {
           onChange={handleChange}
         />
         <p style={{ color: "red" }}>{errors.name}</p>
-        
-          
+
         <input
           name="phone"
           placeholder="Phone Number"
@@ -74,7 +89,6 @@ export default function LoanApplication() {
         />
         <p style={{ color: "red" }}>{errors.phone}</p>
 
-        {/* AMOUNT */}
         <input
           name="amount"
           type="number"
@@ -84,17 +98,15 @@ export default function LoanApplication() {
         />
         <p style={{ color: "red" }}>{errors.amount}</p>
 
-        {/* PERIOD */}
         <input
           name="period"
           type="number"
-          placeholder="Repayment Period(months)"
+          placeholder="Repayment Period"
           value={form.period}
           onChange={handleChange}
         />
         <p style={{ color: "red" }}>{errors.period}</p>
 
-        {/* REASON */}
         <input
           name="reason"
           placeholder="Reason for Loan"

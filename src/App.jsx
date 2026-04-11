@@ -19,7 +19,41 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+<Route
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  }
+/>
 
+<Route
+  path="/apply"
+  element={
+    <ProtectedRoute>
+      <LoanApplication />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/checkout"
+  element={
+    <ProtectedRoute>
+      <Checkout />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/profile"
+  element={
+    <ProtectedRoute>
+      <Profile />
+    </ProtectedRoute>
+  }
+/>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/apply" element={<LoanApplication />} />
         <Route path="/checkout" element={<Checkout />} />

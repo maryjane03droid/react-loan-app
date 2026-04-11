@@ -3,20 +3,38 @@ export const saveUser = (user) => {
 };
 
 export const getUser = () => {
-  return JSON.parse(localStorage.getItem("user"));
+  try {
+    return JSON.parse(localStorage.getItem("user"));
+  } catch {
+    return null;
+  }
 };
-
 export const logoutUser = () => {
   localStorage.removeItem("user");
 };
 export const saveLoan = (loan) => {
-  const existing = JSON.parse(localStorage.getItem("loans")) || [];
-  existing.push(loan);
-  localStorage.setItem("loans", JSON.stringify(existing));
+  try {
+    const existing = getLoans(); // use safe function
+    existing.push(loan);
+    localStorage.setItem("loans", JSON.stringify(existing));
+  } catch (error) {
+    console.log("Error saving loan:", error);
+  }
 };
 
 export const getLoans = () => {
-  return JSON.parse(localStorage.getItem("loans")) || [];
+  try {
+    const data = localStorage.getItem("loans");
+
+    if (!data) return [];
+
+    const parsed = JSON.parse(data);
+
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.log("Error reading loans:", error);
+    return [];
+  }
 };
 export const canBorrow = (user) => {
   const lockUntil = localStorage.getItem("lockUntil");
