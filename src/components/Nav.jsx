@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 function Nav() {
   return (
      <nav>
-      <h3 style={{ color: "white" }}>Loan App</h3>
+      <h3 style={{ color: "white" }}>Loanify App</h3>
 
       <div>
         <Link to="/">Home</Link>

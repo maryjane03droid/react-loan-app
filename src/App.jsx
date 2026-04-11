@@ -23,7 +23,7 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/apply" element={<LoanApplication />} />
         <Route path="/checkout" element={<Checkout />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/Profile" element={<Profile />} />
 
       </Routes>
     </BrowserRouter>

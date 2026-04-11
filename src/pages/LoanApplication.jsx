@@ -6,7 +6,7 @@ export default function LoanApplication() {
 
   const [form, setForm] = useState({
     name: "",
-    phone: "+254",
+    phone: "",
     amount: "",
     period: "",
     reason: "",

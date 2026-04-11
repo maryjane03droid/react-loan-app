@@ -1,3 +1,296 @@
-export default function Login() {
-  return <h2>Profile Page</h2>;
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+export default function Profile() {
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+
+  const [loans, setLoans] = useState([]);
+  const [editing, setEditing] = useState(false);
+
+  // 🔄 Load data on mount
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const storedLoans = JSON.parse(localStorage.getItem("loans"));
+
+    if (storedUser) {
+      setUser(storedUser);
+    } else {
+      // default user
+      const defaultUser = {
+        name: "MJ",
+        email: "mj@email.com",
+        phone: "+254700000000",
+      };
+      setUser(defaultUser);
+      localStorage.setItem("user", JSON.stringify(defaultUser));
+    }
+
+    if (storedLoans) {
+      setLoans(storedLoans);
+    } else {
+      setLoans([]);
+    }
+  }, []);
+
+  // 🧮 Calculate total borrowed
+  const totalBorrowed = loans.reduce(
+    (sum, loan) => sum + Number(loan.amount || 0),
+    0
+  );
+
+  // 🗑 Delete loan
+  const handleDelete = (index) => {
+    const updatedLoans = loans.filter((_, i) => i !== index);
+    setLoans(updatedLoans);
+    localStorage.setItem("loans", JSON.stringify(updatedLoans));
+  };
+
+  // 💾 Save profile edits
+  const handleSave = () => {
+    localStorage.setItem("user", JSON.stringify(user));
+    setEditing(false);
+  };
+
+  // 🚪 Logout
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
+
+  return (
+    <div style={styles.container}>
+      <h2 style={styles.title}>My Profile</h2>
+
+      {/* 👤 Avatar */}
+      <div style={styles.avatar}>
+        {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+      </div>
+
+      {/* 📌 USER INFO */}
+      <div style={styles.card}>
+        <h3>Personal Info</h3>
+
+        {editing ? (
+          <>
+            <input
+              style={styles.input}
+              value={user.name}
+              placeholder="Name"
+              onChange={(e) =>
+                setUser({ ...user, name: e.target.value })
+              }
+            />
+
+            <input
+              style={styles.input}
+              value={user.email}
+              placeholder="Email"
+              onChange={(e) =>
+                setUser({ ...user, email: e.target.value })
+              }
+            />
+
+            <input
+              style={styles.input}
+              value={user.phone}
+              placeholder="Phone"
+              onChange={(e) =>
+                setUser({ ...user, phone: e.target.value })
+              }
+            />
+
+            <button style={styles.saveBtn} onClick={handleSave}>
+              Save
+            </button>
+          </>
+        ) : (
+          <>
+            <p><strong>Name:</strong> {user.name}</p>
+            <p><strong>Email:</strong> {user.email}</p>
+            <p><strong>Phone:</strong> {user.phone}</p>
+
+            <button
+              style={styles.editBtn}
+              onClick={() => setEditing(true)}
+            >
+              Edit Profile
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* 📊 SUMMARY */}
+      <div style={styles.card}>
+        <h3>Loan Summary</h3>
+        <p><strong>Total Loans:</strong> {loans.length}</p>
+        <p><strong>Total Borrowed:</strong> KES {totalBorrowed}</p>
+      </div>
+
+      {/* 📜 LOAN HISTORY */}
+      <div style={styles.card}>
+        <h3>Loan History</h3>
+
+        {loans.length === 0 ? (
+          <p>No loans yet.</p>
+        ) : (
+          loans.map((loan, index) => (
+            <div key={index} style={styles.loanItem}>
+              <p><strong>Amount:</strong> KES {loan.amount}</p>
+              <p><strong>Period:</strong> {loan.period} months</p>
+
+              <p>
+                <strong>Status:</strong>{" "}
+                <span
+                  style={{
+                    color:
+                      loan.status === "Approved"
+                        ? "green"
+                        : loan.status === "Rejected"
+                        ? "red"
+                        : "orange",
+                  }}
+                >
+                  {loan.status || "Pending"}
+                </span>
+              </p>
+
+              <p><strong>Date:</strong> {loan.date}</p>
+
+              <button
+                style={styles.deleteBtn}
+                onClick={() => handleDelete(index)}
+              >
+                Delete
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* 🚀 ACTIONS */}
+      <div style={styles.actions}>
+        <button
+          style={styles.applyBtn}
+          onClick={() => navigate("/apply")}
+        >
+          Apply for Loan
+        </button>
+
+        <button style={styles.logoutBtn} onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+    </div>
+  );
 }
+const styles = {
+  container: {
+    maxWidth: "500px",
+    margin: "auto",
+    padding: "20px",
+    fontFamily: "Arial",
+    background: "#0f172a", // dark background
+    minHeight: "100vh",
+    color: "#f1f5f9", // light text
+  },
+
+  title: {
+    textAlign: "center",
+    color: "#38bdf8",
+  },
+
+  avatar: {
+    width: "80px",
+    height: "80px",
+    borderRadius: "50%",
+    background: "#38bdf8",
+    color: "#0f172a",
+    fontSize: "30px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "20px auto",
+    fontWeight: "bold",
+  },
+
+  card: {
+    background: "#1e293b", // dark card
+    padding: "15px",
+    borderRadius: "12px",
+    marginBottom: "15px",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+  },
+
+  input: {
+    display: "block",
+    width: "100%",
+    marginBottom: "10px",
+    padding: "10px",
+    borderRadius: "8px",
+    border: "1px solid #334155",
+    background: "#0f172a",
+    color: "#fff",
+  },
+
+  loanItem: {
+    borderTop: "1px solid #334155",
+    marginTop: "10px",
+    paddingTop: "10px",
+  },
+
+  actions: {
+    display: "flex",
+    justifyContent: "space-between",
+    marginTop: "20px",
+  },
+
+  applyBtn: {
+    padding: "10px",
+    background: "#22c55e",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+  },
+
+  logoutBtn: {
+    padding: "10px",
+    background: "#ef4444",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+  },
+
+  editBtn: {
+    marginTop: "10px",
+    padding: "8px",
+    background: "#3b82f6",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+  },
+
+  saveBtn: {
+    background: "#22c55e",
+    color: "#fff",
+    padding: "10px",
+    border: "none",
+    borderRadius: "8px",
+  },
+
+  deleteBtn: {
+    marginTop: "10px",
+    background: "#ef4444",
+    color: "#fff",
+    border: "none",
+    padding: "6px",
+    borderRadius: "6px",
+  },
+};
