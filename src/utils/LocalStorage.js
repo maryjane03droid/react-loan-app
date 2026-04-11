@@ -18,3 +18,17 @@ export const saveLoan = (loan) => {
 export const getLoans = () => {
   return JSON.parse(localStorage.getItem("loans")) || [];
 };
+export const canBorrow = (user) => {
+  const lockUntil = localStorage.getItem("lockUntil");
+
+  if (!lockUntil) return true;
+
+  return new Date() > new Date(lockUntil);
+};
+
+export const lockUser = () => {
+  const lockDate = new Date();
+  lockDate.setDate(lockDate.getDate() + 30);
+
+  localStorage.setItem("lockUntil", lockDate.toISOString());
+};

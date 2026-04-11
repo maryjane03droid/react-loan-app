@@ -10,89 +10,111 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  LineChart,
+  Line,
 } from "recharts";
 
 export default function Dashboard() {
   const [loans, setLoans] = useState([]);
 
   useEffect(() => {
-    setLoans(getLoans());
+    setLoans(getLoans() || []);
   }, []);
 
-  // 📊 summary
-  const totalAmount = loans.reduce((sum, l) => sum + Number(l.amount || 0), 0);
-
-  const pending = loans.filter(l => l.status === "Pending").length;
+  const total = loans.reduce((s, l) => s + Number(l.amount || 0), 0);
   const approved = loans.filter(l => l.status === "Approved").length;
+  const rejected = loans.filter(l => l.status === "Rejected").length;
+  const pending = loans.filter(l => l.status === "Pending").length;
 
-  // 🥧 pie data
   const pieData = [
+    { name: "Approved", value: approved },
+    { name: "Rejected", value: rejected },
     { name: "Pending", value: pending },
-    { name: "Approved", value: approved }
   ];
 
-  const COLORS = ["#facc15", "#22c55e"];
+  const COLORS = ["#22c55e", "#ef4444", "#facc15"];
 
-  // 📊 bar data
   const barData = loans.map((l, i) => ({
-    name: `Loan ${i + 1}`,
-    amount: Number(l.amount)
+    name: `L${i + 1}`,
+    amount: Number(l.amount || 0),
+  }));
+
+  const lineData = loans.map((l, i) => ({
+    name: i + 1,
+    amount: Number(l.amount || 0),
   }));
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Analytics Dashboard</h2>
+    <div style={styles.container}>
+      <h2 style={styles.title}>🏦 Fintech Dashboard</h2>
 
-      {/* 📌 STATS CARDS */}
-      <div className="card">
-        <h3>Overview</h3>
-        <p><b>Total Loans:</b> {loans.length}</p>
-        <p><b>Total Amount:</b> KES {totalAmount}</p>
+      {/* TOP METRICS */}
+      <div style={styles.grid}>
+        <div style={styles.card}>
+          <h3>Total Loans</h3>
+          <h1>{loans.length}</h1>
+        </div>
+
+        <div style={styles.card}>
+          <h3>Total Volume</h3>
+          <h1>KES {total}</h1>
+        </div>
+
+        <div style={styles.card}>
+          <h3>Approved</h3>
+          <h1 style={{ color: "#22c55e" }}>{approved}</h1>
+        </div>
+
+        <div style={styles.card}>
+          <h3>Rejected</h3>
+          <h1 style={{ color: "#ef4444" }}>{rejected}</h1>
+        </div>
       </div>
 
-      {/* 📊 CHARTS SECTION */}
-      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+      {/* CHARTS */}
+      <div style={styles.chartGrid}>
 
-        {/* PIE CHART */}
-        <div className="card" style={{ flex: 1, minWidth: "300px" }}>
-          <h3>Loan Status</h3>
-
+        {/* PIE */}
+        <div style={styles.card}>
+          <h3>Loan Status Distribution</h3>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                outerRadius={80}
-                label
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={index} fill={COLORS[index]} />
+              <Pie data={pieData} dataKey="value" outerRadius={80} label>
+                {pieData.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i]} />
                 ))}
               </Pie>
               <Tooltip />
             </PieChart>
           </ResponsiveContainer>
-
-          <p>🟡 Pending vs 🟢 Approved loans</p>
         </div>
 
-        {/* BAR CHART */}
-        <div className="card" style={{ flex: 1, minWidth: "300px" }}>
+        {/* BAR */}
+        <div style={styles.card}>
           <h3>Loan Amounts</h3>
-
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={barData}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="amount" fill="#4da3ff" />
+              <Bar dataKey="amount" fill="#38bdf8" />
             </BarChart>
           </ResponsiveContainer>
-
-          <p>Each loan amount comparison</p>
         </div>
 
+        {/* LINE (GROWTH) */}
+        <div style={styles.card}>
+          <h3>Loan Growth Trend</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={lineData}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="amount" stroke="#a78bfa" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
