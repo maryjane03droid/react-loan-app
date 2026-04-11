@@ -69,54 +69,141 @@ export default function LoanApplication() {
   };
 
   return (
-    <div>
-      <h2 style={{ color: "#facc15" }}>💰 Loan Application</h2>
+  <div style={styles.page}>
+    <div style={styles.card}>
+      <h2 style={styles.title}>💰 Loan Application</h2>
 
-      <form className="card" onSubmit={handleSubmit}>
-        <input
-          name="name"
-          placeholder="Full Name"
-          value={form.name}
-          onChange={handleChange}
-        />
-        <p style={{ color: "red" }}>{errors.name}</p>
+      <form onSubmit={handleSubmit} style={styles.form}>
 
-        <input
-          name="phone"
-          placeholder="Phone Number"
-          value={form.phone}
-          onChange={handleChange}
-        />
-        <p style={{ color: "red" }}>{errors.phone}</p>
+        <div style={styles.inputGroup}>
+          <input
+            name="name"
+            placeholder="Full Name"
+            value={form.name}
+            onChange={handleChange}
+            style={styles.input}
+          />
+          <small style={styles.error}>{errors.name}</small>
+        </div>
 
-        <input
-          name="amount"
-          type="number"
-          placeholder="Loan Amount"
-          value={form.amount}
-          onChange={handleChange}
-        />
-        <p style={{ color: "red" }}>{errors.amount}</p>
+        <div style={styles.inputGroup}>
+          <input
+            name="phone"
+            placeholder="Phone Number"
+            value={form.phone}
+            onChange={handleChange}
+            style={styles.input}
+          />
+          <small style={styles.error}>{errors.phone}</small>
+        </div>
 
-        <input
-          name="period"
-          type="number"
-          placeholder="Repayment Period"
-          value={form.period}
-          onChange={handleChange}
-        />
-        <p style={{ color: "red" }}>{errors.period}</p>
+        <div style={styles.inputGroup}>
+          <input
+            name="amount"
+            type="number"
+            placeholder="Loan Amount (KES)"
+            value={form.amount}
+            onChange={handleChange}
+            style={styles.input}
+          />
+          <small style={styles.error}>{errors.amount}</small>
+        </div>
 
-        <input
-          name="reason"
-          placeholder="Reason for Loan"
-          value={form.reason}
-          onChange={handleChange}
-        />
-        <p style={{ color: "red" }}>{errors.reason}</p>
+        <div style={styles.inputGroup}>
+          <input
+            name="period"
+            type="number"
+            placeholder="Repayment Period (months)"
+            value={form.period}
+            onChange={handleChange}
+            style={styles.input}
+          />
+          <small style={styles.error}>{errors.period}</small>
+        </div>
 
-        <button type="submit">Continue to Checkout</button>
+        <div style={styles.inputGroup}>
+          <input
+            name="reason"
+            placeholder="Reason for Loan"
+            value={form.reason}
+            onChange={handleChange}
+            style={styles.input}
+          />
+          <small style={styles.error}>{errors.reason}</small>
+        </div>
+
+        <button type="submit" style={styles.button}>
+          Continue to Checkout
+        </button>
+
       </form>
     </div>
-  );
+  </div>
+);
 }
+const styles = {
+  page: {
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "linear-gradient(135deg, #0b1220, #111827, #0f172a)",
+    padding: "10px",
+    overflow:"hidden",
+  },
+
+  card: {
+    width: "100%",
+    maxWidth: "650px",
+    background: "rgba(17, 24, 39, 0.95)",
+    padding: "30px",
+    borderRadius: "18px",
+    boxShadow: "0 15px 40px rgba(0,0,0,0.6)",
+    color: "#fff",
+    border: "1px solid rgba(56, 189, 248, 0.2)",
+  },
+
+  title: {
+    textAlign: "center",
+    marginBottom: "20px",
+    color: "#38bdf8",
+  },
+
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+  },
+
+  inputGroup: {
+    display: "flex",
+    flexDirection: "column",
+  },
+
+  input: {
+    padding: "14px",
+    borderRadius: "10px",
+    border: "1px solid #334155",
+    background: "#0b1220",
+    color: "#fff",
+    outline: "none",
+      transition: "0.3s",
+  },
+
+  error: {
+    color: "#ef4444",
+    fontSize: "12px",
+    marginTop: "4px",
+  },
+
+  button: {
+    marginTop: "10px",
+    padding: "12px",
+    borderRadius: "8px",
+    border: "none",
+    background: "#22c55e",
+    color: "#fff",
+    fontWeight: "bold",
+    cursor: "pointer",
+  },
+};
