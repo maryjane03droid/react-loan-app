@@ -1,10 +1,14 @@
 import React from 'react'
 import { Link } from "react-router-dom";
+import { FaHandHoldingUsd } from "react-icons/fa";
+
+
 
 function Nav() {
   return (
      <nav>
-      <h3 style={{ color: "white" }}>Loanify App</h3>
+      <h3 style={{ color: "white" }}>Loanify App <FaHandHoldingUsd size={50} color="#4da3ff" /> </h3>
+     
 
       <div>
         <Link to="/">Home</Link>
