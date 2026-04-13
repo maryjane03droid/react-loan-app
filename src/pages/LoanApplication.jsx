@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { saveLoan } from "../utils/LocalStorage";
 import { processLoan, getLoanQuestions } from "../utils/loanProcesser";
-import LoanQuestions from "./LoanQuestions";
+import LoanQuestions from "./loanQuestions";
 
 export default function LoanApplication() {
   const navigate = useNavigate();
@@ -98,13 +98,7 @@ export default function LoanApplication() {
       <div style={styles.card}>
         <h2 style={styles.title}>💰 Loan Application</h2>
         
-        <div style={styles.infoBox}>
-          <p style={styles.infoText}>
-            ⚡ <strong>Loans of KES 500 or less = INSTANT APPROVAL!</strong><br />
-            📋 <strong>Loans above KES 500</strong> = Answer 5 questions to qualify<br />
-            🎯 <strong>Need 4/5 correct</strong> to get approved for larger loans
-          </p>
-        </div>
+      
 
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.inputGroup}>
