@@ -13,7 +13,7 @@ export default function Profile() {
   const [loans, setLoans] = useState([]);
   const [editing, setEditing] = useState(false);
 
-  // 🔄 Load data on mount
+  // Load data on mount
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const storedLoans = JSON.parse(localStorage.getItem("loans"));
@@ -38,28 +38,52 @@ export default function Profile() {
     }
   }, []);
 
-  // 🧮 Calculate total borrowed
+  // Calculate total borrowed
   const totalBorrowed = loans.reduce(
     (sum, loan) => sum + Number(loan.amount || 0),
     0
   );
 
-  // 🗑 Delete loan
-  const handleDelete = (index) => {
-    const updatedLoans = loans.filter((_, i) => i !== index);
-    setLoans(updatedLoans);
-    localStorage.setItem("loans", JSON.stringify(updatedLoans));
+  // Repay loan function
+  const handleRepay = (index) => {
+    const loanToRepay = loans[index];
+    const confirmRepay = window.confirm(
+      `Are you sure you want to repay KES ${loanToRepay.amount} for ${loanToRepay.name}?`
+    );
+    
+    if (confirmRepay) {
+      const updatedLoans = loans.filter((_, i) => i !== index);
+      setLoans(updatedLoans);
+      localStorage.setItem("loans", JSON.stringify(updatedLoans));
+      alert("✅ Loan repaid successfully! Thank you.");
+    }
   };
 
-  // 💾 Save profile edits
+  // Delete loan (only for non-approved loans)
+  const handleDelete = (index) => {
+    const loanToDelete = loans[index];
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete the ${loanToDelete.status} loan application for KES ${loanToDelete.amount}?`
+    );
+    
+    if (confirmDelete) {
+      const updatedLoans = loans.filter((_, i) => i !== index);
+      setLoans(updatedLoans);
+      localStorage.setItem("loans", JSON.stringify(updatedLoans));
+      alert("❌ Loan application deleted.");
+    }
+  };
+
+  // Save profile edits
   const handleSave = () => {
     localStorage.setItem("user", JSON.stringify(user));
     setEditing(false);
   };
 
-  // 🚪 Logout
+  // Logout
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem("user");
+    localStorage.removeItem("loans");
     navigate("/");
   };
 
@@ -67,12 +91,12 @@ export default function Profile() {
     <div style={styles.container}>
       <h2 style={styles.title}>My Profile</h2>
 
-      {/* 👤 Avatar */}
+      {/* Avatar */}
       <div style={styles.avatar}>
         {user.name ? user.name.charAt(0).toUpperCase() : "U"}
       </div>
 
-      {/* 📌 USER INFO */}
+      {/* USER INFO */}
       <div style={styles.card}>
         <h3>Personal Info</h3>
 
@@ -125,14 +149,14 @@ export default function Profile() {
         )}
       </div>
 
-      {/* 📊 SUMMARY */}
+      {/* SUMMARY */}
       <div style={styles.card}>
         <h3>Loan Summary</h3>
         <p><strong>Total Loans:</strong> {loans.length}</p>
         <p><strong>Total Borrowed:</strong> KES {totalBorrowed}</p>
       </div>
 
-      {/* 📜 LOAN HISTORY */}
+      {/* LOAN HISTORY */}
       <div style={styles.card}>
         <h3>Loan History</h3>
 
@@ -143,6 +167,7 @@ export default function Profile() {
             <div key={index} style={styles.loanItem}>
               <p><strong>Amount:</strong> KES {loan.amount}</p>
               <p><strong>Period:</strong> {loan.period} months</p>
+              <p><strong>Reason:</strong> {loan.reason}</p>
 
               <p>
                 <strong>Status:</strong>{" "}
@@ -150,30 +175,51 @@ export default function Profile() {
                   style={{
                     color:
                       loan.status === "Approved"
-                        ? "green"
+                        ? "#22c55e"
                         : loan.status === "Rejected"
-                        ? "red"
-                        : "orange",
+                        ? "#ef4444"
+                        : loan.status === "Locked"
+                        ? "#ff4444"
+                        : "#facc15",
                   }}
                 >
                   {loan.status || "Pending"}
                 </span>
               </p>
 
-              <p><strong>Date:</strong> {loan.date}</p>
+              {loan.date && (
+                <p><strong>Date:</strong> {new Date(loan.date).toLocaleDateString()}</p>
+              )}
 
-              <button
-                style={styles.deleteBtn}
-                onClick={() => handleDelete(index)}
-              >
-                Delete
-              </button>
+              {loan.message && (
+                <p><strong>Message:</strong> {loan.message}</p>
+              )}
+
+              {/* Show REPAY button for approved loans */}
+              {loan.status === "Approved" && (
+                <button
+                  style={styles.repayBtn}
+                  onClick={() => handleRepay(index)}
+                >
+                  💰 Repay Loan
+                </button>
+              )}
+
+              {/* Show DELETE button only for non-approved loans (Pending, Rejected) */}
+              {loan.status !== "Approved" && (
+                <button
+                  style={styles.deleteBtn}
+                  onClick={() => handleDelete(index)}
+                >
+                  🗑️ Delete Application
+                </button>
+              )}
             </div>
           ))
         )}
       </div>
 
-      {/* 🚀 ACTIONS */}
+      {/* ACTIONS */}
       <div style={styles.actions}>
         <button
           style={styles.applyBtn}
@@ -189,15 +235,16 @@ export default function Profile() {
     </div>
   );
 }
+
 const styles = {
   container: {
-    maxWidth: "500px",
+    maxWidth: "600px",
     margin: "auto",
     padding: "20px",
     fontFamily: "Arial",
-    background: "#0f172a", // dark background
+    background: "#0f172a",
     minHeight: "100vh",
-    color: "#f1f5f9", // light text
+    color: "#f1f5f9",
   },
 
   title: {
@@ -220,7 +267,7 @@ const styles = {
   },
 
   card: {
-    background: "#1e293b", // dark card
+    background: "#1e293b",
     padding: "15px",
     borderRadius: "12px",
     marginBottom: "15px",
@@ -248,6 +295,7 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     marginTop: "20px",
+    gap: "10px",
   },
 
   applyBtn: {
@@ -257,6 +305,7 @@ const styles = {
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
+    flex: 1,
   },
 
   logoutBtn: {
@@ -266,6 +315,7 @@ const styles = {
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
+    flex: 1,
   },
 
   editBtn: {
@@ -275,6 +325,7 @@ const styles = {
     color: "#fff",
     border: "none",
     borderRadius: "8px",
+    cursor: "pointer",
   },
 
   saveBtn: {
@@ -283,6 +334,7 @@ const styles = {
     padding: "10px",
     border: "none",
     borderRadius: "8px",
+    cursor: "pointer",
   },
 
   deleteBtn: {
@@ -290,7 +342,21 @@ const styles = {
     background: "#ef4444",
     color: "#fff",
     border: "none",
-    padding: "6px",
+    padding: "8px",
     borderRadius: "6px",
+    cursor: "pointer",
+    width: "100%",
+  },
+
+  repayBtn: {
+    marginTop: "10px",
+    background: "#22c55e",
+    color: "#fff",
+    border: "none",
+    padding: "8px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    width: "100%",
+    fontWeight: "bold",
   },
 };

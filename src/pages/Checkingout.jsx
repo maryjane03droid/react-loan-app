@@ -1,21 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { saveLoan } from "../utils/LocalStorage";
+import { saveLoan, getLoans } from "../utils/LocalStorage";
 
 export default function Checkingout() {
   const [loan, setLoan] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    try {
-      const data = JSON.parse(localStorage.getItem("loan") || "null");
-      setLoan(data || null);
-    } catch (err) {
-      console.log("Checkout error:", err);
-      setLoan(null);
-    }
-  }, []);
-
+ useEffect(() => {
+  try {
+    const currentLoan = JSON.parse(localStorage.getItem("currentLoan"));
+    setLoan(currentLoan || null);
+  } catch (err) {
+    console.log("Checkout error:", err);
+    setLoan(null);
+  }
+}, []);
   if (!loan) {
     return (
       <div style={styles.container}>
@@ -40,9 +39,11 @@ export default function Checkingout() {
       date: new Date().toISOString(),
     };
 
-    saveLoan(newLoan);
-
-    localStorage.removeItem("loan");
+    // Remove the old loan and save the updated one
+    const allLoans = getLoans();
+    allLoans.pop(); // remove the temporary loan
+    allLoans.push(newLoan); // add the confirmed loan
+    localStorage.setItem("loans", JSON.stringify(allLoans));
 
     navigate("/dashboard");
   };
@@ -61,7 +62,6 @@ export default function Checkingout() {
         <p>
           <b>Amount:</b> KES {loan.amount}
         </p>
-        <p>Status: {loan.status}</p>
         <p>
           <b>Period:</b> {loan.period} months
         </p>

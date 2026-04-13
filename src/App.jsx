@@ -8,59 +8,55 @@ import LoanApplication from "./pages/LoanApplication";
 import Checkout from "./pages/Checkingout";
 import Profile from "./pages/Profile";
 import Navbar from "./components/Nav";
+import Footer from "./components/footer";  // ✅ ADD THIS IMPORT
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Navbar/>
+      <Navbar />
       <Routes>
-
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-<Route
-  path="/dashboard"
-  element={
-    <ProtectedRoute>
-      <Dashboard />
-    </ProtectedRoute>
-  }
-/>
+        
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
 
-<Route
-  path="/apply"
-  element={
-    <ProtectedRoute>
-      <LoanApplication />
-    </ProtectedRoute>
-  }
-/>
+        <Route
+          path="/apply"
+          element={
+            <ProtectedRoute>
+              <LoanApplication />
+            </ProtectedRoute>
+          }
+        />
 
-<Route
-  path="/checkout"
-  element={
-    <ProtectedRoute>
-      <Checkout />
-    </ProtectedRoute>
-  }
-/>
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
 
-<Route
-  path="/profile"
-  element={
-    <ProtectedRoute>
-      <Profile />
-    </ProtectedRoute>
-  }
-/>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/apply" element={<LoanApplication />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/Profile" element={<Profile />} />
-
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
-      <footer/>
+      <Footer />  {/* ✅ CHANGE footer to Footer */}
     </BrowserRouter>
   );
 }
